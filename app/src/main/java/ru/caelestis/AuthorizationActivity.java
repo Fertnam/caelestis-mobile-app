@@ -3,11 +3,19 @@ package ru.caelestis;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +35,11 @@ public class AuthorizationActivity extends AppCompatActivity {
     private ImageView logoImage;
 
     /** Поле, хранящее TextView для отображения ошибок */
-    private TextView errorText;
+    /** Поле, хранящее TextView для отображения сообщения о возможности регистрации (с ссылкой на активити) */
+    private TextView errorText, toRegisterActivityFromAuth;
+
+    /** Поле, хранящее кнопку авторизации */
+    private Button authButton;
 
     /** Поле, хранящее авторизованного пользователя */
     private User user;
@@ -46,9 +58,44 @@ public class AuthorizationActivity extends AppCompatActivity {
         sessionManagement = new SessionManagement(this);
 
         errorText = (TextView) findViewById(R.id.errorText);
+        toRegisterActivityFromAuth = (TextView) findViewById(R.id.toRegisterActivityFromAuth);
+
+        authButton = (Button) findViewById(R.id.authButton);
 
         logoImage = (ImageView) findViewById(R.id.logoImage);
         logoImage.setImageResource(R.drawable.logo);
+
+        fillToRegisterActivityFromAuth();
+    }
+
+    /**
+     * Метод, который вешает ссылку на Activity регистрации в TextView
+     */
+    private void fillToRegisterActivityFromAuth() {
+        SpannableString spannableString = new SpannableString("Нет аккаунта? Зарегистрироваться.");
+
+        ClickableSpan clickableSpan = new ClickableSpan() {
+            /**
+             * Событие, которое произойдёт при клике по ссылке
+             */
+            @Override
+            public void onClick(@NonNull View widget) {
+                AuthorizationActivity.this.startActivity(new Intent(AuthorizationActivity.this, RegistrationActivity.class));
+            }
+
+            /**
+             * Метод, выполняющий стилизацию ссылки
+             */
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                ds.setColor(getResources().getColor(R.color.yellow_bg));
+            }
+        };
+
+        spannableString.setSpan(clickableSpan, 14, 32, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        toRegisterActivityFromAuth.setText(spannableString);
+        toRegisterActivityFromAuth.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     /**
@@ -57,6 +104,8 @@ public class AuthorizationActivity extends AppCompatActivity {
     public void onAuthButtonClick(View view) {
         EditText UsernameInput = (EditText) findViewById(R.id.authUsername),
                  PasswordInput = (EditText) findViewById(R.id.authPassword);
+
+        authButton.setEnabled(false);
 
         new AuthorizationAsyncTask().execute(UsernameInput.getText().toString(), PasswordInput.getText().toString());
     }
@@ -144,6 +193,8 @@ public class AuthorizationActivity extends AppCompatActivity {
                 errorText.setVisibility(View.VISIBLE);
                 errorText.setText("Возникла ошибка при подключении к серверу");
             }
+
+            authButton.setEnabled(true);
         }
     }
 }

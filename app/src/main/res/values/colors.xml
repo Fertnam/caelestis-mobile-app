@@ -9,4 +9,5 @@
     <color name="main_bg">#C6C9DE</color>
     <color name="light_blue_text">#878CB0</color>
     <color name="underline_profile">#9FA1B3</color>
+    <color name="yellow_bg">#FFF9CC</color>
 </resources>

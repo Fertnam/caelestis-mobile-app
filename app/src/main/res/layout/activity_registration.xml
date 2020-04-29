@@ -5,32 +5,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black_bg"
-    tools:context=".AuthorizationActivity">
+    tools:context=".RegistrationActivity">
 
     <LinearLayout
-        android:id="@+id/bg"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="30dp"
-        android:background="@color/black_bg"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.56">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/logoImage"
+            android:id="@+id/logoImageInReg"
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            tools:src="@drawable/logo" />
+            app:srcCompat="@drawable/logo" />
 
         <EditText
-            android:id="@+id/authUsername"
+            android:id="@+id/registerUsername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -41,11 +38,26 @@
             android:padding="8dp"
             android:textAlignment="center"
             android:textColor="@color/black_bg"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/authPassword"
+            android:id="@+id/registerEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@color/light_bg"
+            android:ems="10"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:padding="8dp"
+            android:textAlignment="center"
+            android:textColor="@color/black_bg"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/registerPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -56,14 +68,30 @@
             android:padding="8dp"
             android:textAlignment="center"
             android:textColor="@color/black_bg"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/errorText"
+        <EditText
+            android:id="@+id/registerRepeatPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:background="@color/light_bg"
+            android:ems="10"
+            android:hint="Повторите пароль"
+            android:inputType="textPassword"
+            android:padding="8dp"
+            android:textAlignment="center"
+            android:textColor="@color/black_bg"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/registerErrorText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@color/black_bg"
             android:textAlignment="center"
             android:textColor="@color/error"
             android:textSize="16sp"
@@ -71,28 +99,22 @@
             android:visibility="gone" />
 
         <Button
-            android:id="@+id/authButton"
+            android:id="@+id/registerButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="35dp"
             android:background="@color/light_bg"
-            android:onClick="onAuthButtonClick"
             android:padding="8dp"
-            android:shadowColor="@color/colorAccent"
-            android:shadowDx="20"
-            android:shadowDy="20"
-            android:text="Войти"
-            android:textAllCaps="true"
+            android:text="Зарегистрироваться"
             android:textColor="@color/black_bg"
-            android:textSize="14sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/toRegisterActivityFromAuth"
+            android:id="@+id/toActivateActivityFromRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Нет аккаунта? Зарегистрироваться."
+            android:text="Уже зарегистрированы? Активировать."
             android:textAlignment="center"
             android:textColor="@color/light_bg"
             android:textSize="16sp"
