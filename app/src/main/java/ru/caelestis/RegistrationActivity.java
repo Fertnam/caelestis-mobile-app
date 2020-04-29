@@ -20,9 +20,6 @@ import android.widget.TextView;
  * @version 1
  */
 public class RegistrationActivity extends AppCompatActivity {
-    /** Поле, хранящее ImageView для отображения логотипа */
-    private ImageView logoImage;
-
     /** Поле, хранящее TextView для отображения сообщения о возможности активации (с ссылкой на активити) */
     private TextView toActivateActivityFromRegister;
 
@@ -35,9 +32,6 @@ public class RegistrationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_registration);
 
         toActivateActivityFromRegister = (TextView) findViewById(R.id.toActivateActivityFromRegister);
-
-        logoImage = (ImageView) findViewById(R.id.logoImageInReg);
-        logoImage.setImageResource(R.drawable.logo);
 
         fillToActivationActivityFromRegister();
     }

@@ -28,12 +28,9 @@ import ru.caelestis.managements.SessionManagement;
 /**
  * Activity с формой авторизации
  * @autor Миколенко Евгений (Fertnam)
- * @version 1
+ * @version 2
  */
 public class AuthorizationActivity extends AppCompatActivity {
-    /** Поле, хранящее ImageView для отображения логотипа */
-    private ImageView logoImage;
-
     /** Поле, хранящее TextView для отображения ошибок */
     /** Поле, хранящее TextView для отображения сообщения о возможности регистрации (с ссылкой на активити) */
     private TextView errorText, toRegisterActivityFromAuth;
@@ -61,9 +58,6 @@ public class AuthorizationActivity extends AppCompatActivity {
         toRegisterActivityFromAuth = (TextView) findViewById(R.id.toRegisterActivityFromAuth);
 
         authButton = (Button) findViewById(R.id.authButton);
-
-        logoImage = (ImageView) findViewById(R.id.logoImage);
-        logoImage.setImageResource(R.drawable.logo);
 
         fillToRegisterActivityFromAuth();
     }

@@ -11,9 +11,6 @@ import android.widget.ImageView;
  * @version 1
  */
 public class ActivationActivity extends AppCompatActivity {
-    /** Поле, хранящее ImageView для отображения логотипа */
-    private ImageView logoImage;
-
     /**
      * Метод, выполняющийся при создании activity
      */
@@ -21,8 +18,5 @@ public class ActivationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activation);
-
-        logoImage = (ImageView) findViewById(R.id.logoImageInActivate);
-        logoImage.setImageResource(R.drawable.logo);
     }
 }
