@@ -47,6 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="35dp"
             android:background="@color/light_bg"
+            android:onClick="onActivateButtonClick"
             android:padding="8dp"
             android:text="активировать"
             android:textStyle="bold" />

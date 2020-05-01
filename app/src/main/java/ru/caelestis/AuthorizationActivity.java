@@ -96,12 +96,12 @@ public class AuthorizationActivity extends AppCompatActivity {
      * Метод, выполняющийся при нажатии на кнопку авторизации
      */
     public void onAuthButtonClick(View view) {
-        EditText UsernameInput = (EditText) findViewById(R.id.authUsername),
-                 PasswordInput = (EditText) findViewById(R.id.authPassword);
+        EditText usernameInput = (EditText) findViewById(R.id.authUsername),
+                 passwordInput = (EditText) findViewById(R.id.authPassword);
 
         authButton.setEnabled(false);
 
-        new AuthorizationAsyncTask().execute(UsernameInput.getText().toString(), PasswordInput.getText().toString());
+        new AuthorizationAsyncTask().execute(usernameInput.getText().toString(), passwordInput.getText().toString());
     }
 
     /**
