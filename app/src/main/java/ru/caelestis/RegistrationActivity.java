@@ -2,7 +2,6 @@ package ru.caelestis;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -11,7 +10,6 @@ import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 /**

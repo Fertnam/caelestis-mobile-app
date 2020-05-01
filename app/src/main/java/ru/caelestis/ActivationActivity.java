@@ -1,24 +1,15 @@
 package ru.caelestis;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.Scanner;
-
-import ru.caelestis.entities.User;
+import ru.caelestis.restapi.GET;
 
 /**
  * Activity с формой активации
@@ -54,66 +45,30 @@ public class ActivationActivity extends AppCompatActivity {
     /**
      * AsyncTask для активации
      * @autor Миколенко Евгений (Fertnam)
-     * @version 1
+     * @version 2
      */
-    class ActivatationAsyncTask extends AsyncTask<String, Void, JSONObject> {
+    class ActivatationAsyncTask extends GET {
         /**
-         * Константа, хранящая адрес для запроса
+         * Конструктор, в котором создаётся AsyncTask
          */
-        private final String URL = "https://caelestis.ru/activation/:activation_code";
-
-        /**
-         * Метод, в котором описывается процесс активации
-         * @param data - массив с данными для авторизации
-         * @return Ответ с сервера в виде строки JSON
-         */
-        @Override
-        protected JSONObject doInBackground(String... data) {
-            JSONObject result = null;
-
-            String queryWithParams = URL.replace(":activation_code", data[0]);
-
-            try {
-                java.net.URL urlObject = new java.net.URL(queryWithParams);
-                HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
-
-                connection.setDoInput(true);
-
-                connection.connect();
-
-                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    Scanner Scanner = new Scanner(connection.getInputStream());
-
-                    StringBuilder answer = new StringBuilder();
-
-                    while (Scanner.hasNextLine()) {
-                        answer.append(Scanner.nextLine());
-                    }
-
-                    result = new JSONObject(answer.toString());
-                }
-            } catch (IOException | JSONException e) {
-                e.printStackTrace();
-            }
-
-            return result;
+        public ActivatationAsyncTask() {
+            super();
+            url = "https://caelestis.ru/activation/::";
         }
 
         /**
          * Метод, в котором обрабатывается ответ с сервера
-         * @param answer - ответ с сервера в виде JSON-строки
+         * @param serverAnswer - ответ с сервера в виде JSON-строки
          */
         @Override
-        protected void onPostExecute(JSONObject answer) {
-            super.onPostExecute(answer);
-
+        protected void onPostExecute(JSONObject serverAnswer) {
             String toastMessage = null;
 
-            if (answer != null) {
+            if (serverAnswer != null) {
                 try {
-                    toastMessage = answer.getString("comment");
+                    toastMessage = serverAnswer.getString("comment");
 
-                    if (answer.getBoolean("success")) {
+                    if (serverAnswer.getBoolean("success")) {
                         startActivity(new Intent(ActivationActivity.this, MainActivity.class));
                         finish();
                     }

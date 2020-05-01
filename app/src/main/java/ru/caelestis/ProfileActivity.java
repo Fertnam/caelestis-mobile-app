@@ -2,23 +2,20 @@ package ru.caelestis;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Map;
+import ru.caelestis.enums.SkinMode;
 import ru.caelestis.managements.SessionManagement;
+import ru.caelestis.restapi.Image;
 
 /**
  * Activity с профилем пользователя
  * @autor Миколенко Евгений (Fertnam)
- * @version 1
+ * @version 2
  */
 public class ProfileActivity extends AppCompatActivity {
     /**
@@ -69,8 +66,8 @@ public class ProfileActivity extends AppCompatActivity {
     private void fillSkins() {
         String username = sessionManagement.getAllSession().get("username").toString();
 
-        new SkinDownloadAsyncTask().execute(username, "1", "205");
-        new SkinDownloadAsyncTask().execute(username, "2", "205");
+        new SkinDownloadAsyncTask(SkinMode.FRONT).execute(username, "205");
+        new SkinDownloadAsyncTask(SkinMode.BACK).execute(username, "205");
     }
 
     /**
@@ -101,61 +98,35 @@ public class ProfileActivity extends AppCompatActivity {
     /**
      * AsyncTask для загрузки скинов с сервера
      * @autor Миколенко Евгений (Fertnam)
-     * @version 1
+     * @version 2
      */
-    class SkinDownloadAsyncTask extends AsyncTask<String, Void, Bitmap> {
+    class SkinDownloadAsyncTask extends Image {
         /**
          * Поле, хранящее режим загрузки скина
          */
-        private String mode;
+        private SkinMode mode;
 
         /**
-         * Константа, хранящая адрес для запроса
+         * Конструктор, в котором создаётся AsyncTask
+         * @param mode - режим загрузки скина
          */
-        private final String URL = "https://caelestis.ru/application/components/skin.php?user=:username&mode=:mode&size=:size";
+        public SkinDownloadAsyncTask(final SkinMode mode) {
+            super();
 
-        /**
-         * Метод, в котором описывается процесс загрузки
-         * @param data - массив с данными для загрузки
-         * @return Пиксельное представление скина
-         */
-        @Override
-        protected Bitmap doInBackground(String ... data) {
-            Bitmap result = null;
-
-            mode = data[1];
-
-            String queryWithParams = URL.replace(":username", data[0]).replace(":mode", data[1]).replace(":size", data[2]);
-
-            try {
-                java.net.URL urlObject = new URL(queryWithParams);
-
-                HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
-
-                connection.connect();
-
-                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    result = BitmapFactory.decodeStream(connection.getInputStream());
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return result;
+            this.mode = mode;
+            url = "https://caelestis.ru/application/components/skin.php?user=::&mode=" + mode.getCode() + "&size=::";
         }
 
         /**
          * Метод, в котором подставляются скины в ImageView
-         * @param result - пиксельное представления изображения
+         * @param imageBitmap - пиксельное представления скина
          */
         @Override
-        protected void onPostExecute(Bitmap result) {
-            super.onPostExecute(result);
-
+        protected void onPostExecute(Bitmap imageBitmap) {
             switch (mode) {
-                case "2": backSkinImage.setImageBitmap(result); break;
-                case "1":
-                default: frontSkinImage.setImageBitmap(result); break;
+                case BACK: backSkinImage.setImageBitmap(imageBitmap); break;
+                case FRONT:
+                default: frontSkinImage.setImageBitmap(imageBitmap); break;
             }
         }
     }
