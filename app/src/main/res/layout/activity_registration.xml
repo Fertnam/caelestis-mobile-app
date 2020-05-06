@@ -104,6 +104,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="35dp"
             android:background="@color/light_bg"
+            android:onClick="onRegisterButtonClick"
             android:padding="8dp"
             android:text="Зарегистрироваться"
             android:textColor="@color/black_bg"

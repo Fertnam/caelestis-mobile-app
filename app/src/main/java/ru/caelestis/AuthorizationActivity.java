@@ -110,7 +110,7 @@ public class AuthorizationActivity extends AppCompatActivity {
          */
         public AuthorizationAsyncTask() {
             super();
-            url = "https://caelestis.ru/authorization/mobile/::/::";
+            url = "https://caelestis.ru/auth/mobile/::/::";
         }
 
         /**
