@@ -1,6 +1,11 @@
 package ru.caelestis;
 
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -25,7 +30,24 @@ import ru.caelestis.restapi.GET;
  * @autor Миколенко Евгений (Fertnam)
  * @version 2
  */
-public class AuthorizationActivity extends AppCompatActivity {
+public class AuthorizationActivity extends AppCompatActivity implements SensorEventListener {
+    /** Поле, хранящее время последнего обновления датчика */
+    private long lastUpdate = 0;
+
+    /** Поле, хранящее последнюю координату x */
+    /** Поле, хранящее последнюю координату y */
+    /** Поле, хранящее последнюю координату z */
+    private float lastX, lastY, lastZ;
+
+    /** Поле, хранящее порог чувствительности акселерометра */
+    private static final int SHAKE_THRESHOLD = 600;
+
+    /** Поле, хранящее объект для доступа к сенсорам устройства */
+    private SensorManager sensorManager;
+
+    /** Поле, хранящее объект для доступа к акслерометру */
+    private Sensor accelerometer;
+
     /** Поле, хранящее TextView для отображения ошибок */
     /** Поле, хранящее TextView для отображения сообщения о возможности регистрации (с ссылкой на активити) */
     private TextView errorText, toRegisterActivityFromAuth;
@@ -54,7 +76,30 @@ public class AuthorizationActivity extends AppCompatActivity {
 
         authButton = (Button) findViewById(R.id.authButton);
 
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+
         fillToRegisterActivityFromAuth();
+    }
+
+    /**
+     * Метод, выполняющийся при паузе activity
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(this);
+    }
+
+    /**
+     * Метод, выполняющийся при возобновлении работы activity
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     /**
@@ -98,6 +143,49 @@ public class AuthorizationActivity extends AppCompatActivity {
 
         new AuthorizationAsyncTask().execute(usernameInput.getText().toString(), passwordInput.getText().toString());
     }
+
+    /**
+     * Метод, выполняющийся при изменении значений акселерометра
+     */
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        Sensor sensor = event.sensor;
+
+        if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float x, y, z;
+
+            x = event.values[0];
+            y = event.values[1];
+            z = event.values[2];
+
+            long currentTime = System.currentTimeMillis(),
+                 timeDifference = (currentTime - lastUpdate);
+
+            if (timeDifference > 100) {
+                lastUpdate = currentTime;
+
+                float speed = Math.abs(x + y + z - lastX - lastY - lastZ) / timeDifference * 10000;
+
+                if (speed > SHAKE_THRESHOLD) {
+                    onAuthButtonClick(null);
+                }
+
+                lastX = x;
+                lastY = y;
+                lastZ = z;
+            }
+        }
+    }
+
+    /**
+     * Метод, выполняющийся при изменении точности показаний
+     */
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        //НИЧЕГО
+    }
+    //Добавить событие на датчик (при тряске телефона проводить авторизацию пользователя)
+    //Голосовой ввод логина
 
     /**
      * AsyncTask для авторизации
