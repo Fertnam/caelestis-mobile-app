@@ -7,6 +7,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -15,12 +16,17 @@ import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+
 import ru.caelestis.entities.User;
 import ru.caelestis.managements.SessionManagement;
 import ru.caelestis.restapi.GET;
@@ -52,6 +58,10 @@ public class AuthorizationActivity extends AppCompatActivity implements SensorEv
     /** Поле, хранящее TextView для отображения сообщения о возможности регистрации (с ссылкой на активити) */
     private TextView errorText, toRegisterActivityFromAuth;
 
+    /** Поле, хранящее EditText для ввода логина */
+    /** Поле, хранящее EditText для ввода пароля */
+    private EditText usernameInput, passwordInput;
+
     /** Поле, хранящее кнопку авторизации */
     private Button authButton;
 
@@ -73,6 +83,9 @@ public class AuthorizationActivity extends AppCompatActivity implements SensorEv
 
         errorText = (TextView) findViewById(R.id.errorText);
         toRegisterActivityFromAuth = (TextView) findViewById(R.id.toRegisterActivityFromAuth);
+
+        usernameInput = (EditText) findViewById(R.id.authUsername);
+        passwordInput = (EditText) findViewById(R.id.authPassword);
 
         authButton = (Button) findViewById(R.id.authButton);
 
@@ -136,12 +149,40 @@ public class AuthorizationActivity extends AppCompatActivity implements SensorEv
      * Метод, выполняющийся при нажатии на кнопку авторизации
      */
     public void onAuthButtonClick(View view) {
-        EditText usernameInput = (EditText) findViewById(R.id.authUsername),
-                 passwordInput = (EditText) findViewById(R.id.authPassword);
-
         authButton.setEnabled(false);
 
         new AuthorizationAsyncTask().execute(usernameInput.getText().toString(), passwordInput.getText().toString());
+    }
+
+    /**
+     * Метод, выполняющийся при нажатии на кнопку голосового ввода
+     */
+    public void onSpeechButtonClick(View view) {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+
+        String defaultLaunguage = "en-US";
+
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, defaultLaunguage);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, defaultLaunguage);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, defaultLaunguage);
+        intent.putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, defaultLaunguage);
+        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Произнесите ваш логин");
+
+        startActivityForResult(intent, 1);
+    }
+
+    /**
+     * Метод для обработки результата с RecognizerIntent
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode == RESULT_OK) {
+            ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            usernameInput.setText(result.get(0));
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     /**
@@ -184,8 +225,6 @@ public class AuthorizationActivity extends AppCompatActivity implements SensorEv
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         //НИЧЕГО
     }
-    //Добавить событие на датчик (при тряске телефона проводить авторизацию пользователя)
-    //Голосовой ввод логина
 
     /**
      * AsyncTask для авторизации
