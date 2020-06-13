@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -16,30 +15,54 @@ import com.vk.api.sdk.VK;
 import com.vk.api.sdk.VKApiCallback;
 import com.vk.api.sdk.auth.VKAccessToken;
 import com.vk.api.sdk.auth.VKAuthCallback;
-import com.vk.api.sdk.auth.VKScope;
 import com.vk.api.sdk.requests.VKRequest;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.Collection;
 import ru.caelestis.restapi.Image;
+import ru.caelestis.enums.VkAvatar;
 
+/**
+ * Activity для вывлода данных аккаунта ВК
+ * @autor Миколенко Евгений (Fertnam)
+ * @version 2
+ */
 public class VKActivity extends AppCompatActivity {
+    /**
+     * Поле, хранящее объект класса ListView для хранения списка друзей
+     */
     private ListView friendsList;
 
+    /**
+     * Поле, хранящее объект класса TextView для отображения имени текущего пользователя
+     */
     private TextView currentUserTextView;
 
-    private ImageView vkAvatar;
+    /**
+     * Поле, хранящее объект класса ImageView для отображения аватарки текущего пользователя
+     */
+    private ImageView vkCurrentUserAvatar;
 
-    private ArrayList<String> friends = new ArrayList(),
-                              friendsAvatartsUrl = new ArrayList();
+    /**
+     * Поле, хранящее список имён друзей
+     */
+    private ArrayList<String> friendsName = new ArrayList();
 
+    /**
+     * Поле, хранящее список битмапов аватарок пользователей
+     */
     private ArrayList<Bitmap> friendsAvatarsBitmap = new ArrayList();
 
+    /**
+     * Поле, хранящее адаптер друзей для вывода в ListView
+     */
     private VKFriendsAdapter adapter = new VKFriendsAdapter();
 
+    /**
+     * Метод, выполняющийся при создании activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,11 +70,14 @@ public class VKActivity extends AppCompatActivity {
 
         friendsList = (ListView) findViewById(R.id.friendsList);
         currentUserTextView = (TextView) findViewById(R.id.currentUserTextView);
-        vkAvatar = (ImageView) findViewById(R.id.vkAvatar);
+        vkCurrentUserAvatar = (ImageView) findViewById(R.id.vkAvatar);
 
         VK.login(this);
     }
 
+    /**
+     * Метод для обработки результатов вызовы vk-activity
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         VKAuthCallback callback = new VKAuthCallback() {
@@ -64,7 +90,7 @@ public class VKActivity extends AppCompatActivity {
 
             @Override
             public void onLoginFailed(int i) {
-
+                System.out.println("Авторизация провалена");
             }
 
             private void fillCurrentUser() {
@@ -83,7 +109,7 @@ public class VKActivity extends AppCompatActivity {
 
                     @Override
                     public void fail(@NotNull Exception e) {
-
+                        System.out.println("Запрос провален");
                     }
                 });
             }
@@ -100,7 +126,7 @@ public class VKActivity extends AppCompatActivity {
                             JSONObject json = new JSONObject(o.toString()).getJSONArray("response").getJSONObject(0);
 
                             String avatarUrl = json.getString("photo_200_orig");
-                            new AvatarDownloadAsyncTask(1, avatarUrl).execute();
+                            new AvatarDownloadAsyncTask(VkAvatar.CURRENT, avatarUrl).execute();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -108,7 +134,7 @@ public class VKActivity extends AppCompatActivity {
 
                     @Override
                     public void fail(@NotNull Exception e) {
-
+                        System.out.println("Запрос провален");
                     }
                 });
             }
@@ -127,9 +153,9 @@ public class VKActivity extends AppCompatActivity {
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject friend = jsonArray.getJSONObject(i);
 
-                                friends.add(friend.getString("first_name") + " " + friend.getString("last_name"));
+                                friendsName.add(friend.getString("first_name") + " " + friend.getString("last_name"));
 
-                                new AvatarDownloadAsyncTask(2, friend.getString("photo_200_orig")).execute();
+                                new AvatarDownloadAsyncTask(VkAvatar.FRIEND, friend.getString("photo_200_orig")).execute();
                             }
 
                             friendsList.setAdapter(adapter);
@@ -140,32 +166,31 @@ public class VKActivity extends AppCompatActivity {
 
                     @Override
                     public void fail(@NotNull Exception e) {
-
+                        System.out.println("Запрос провален");
                     }
                 });
             }
         };
 
-        if (VK.onActivityResult(requestCode, resultCode, data, callback)) {
-
-        }
+        VK.onActivityResult(requestCode, resultCode, data, callback);
 
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     /**
-     * AsyncTask для загрузки скинов с сервера
+     * AsyncTask для загрузки аватарок VK
      * @autor Миколенко Евгений (Fertnam)
      * @version 2
      */
     class AvatarDownloadAsyncTask extends Image {
-        private int mode;
+        private VkAvatar mode;
 
         /**
          * Конструктор, в котором создаётся AsyncTask
-         * @param mode - режим загрузки скина
+         * @param mode - режим загрузки аватарки
+         * @param url - url аватарки
          */
-        public AvatarDownloadAsyncTask(final int mode, final String url) {
+        public AvatarDownloadAsyncTask(final VkAvatar mode, final String url) {
             super();
 
             this.mode = mode;
@@ -178,19 +203,24 @@ public class VKActivity extends AppCompatActivity {
          */
         @Override
         protected void onPostExecute(Bitmap imageBitmap) {
-            if (mode == 1) {
-                vkAvatar.setImageBitmap(imageBitmap);
-            } else {
-                friendsAvatarsBitmap.add(imageBitmap);
-                adapter.notifyDataSetChanged();
+            switch (mode){
+                case CURRENT: vkCurrentUserAvatar.setImageBitmap(imageBitmap); break;
+                case FRIEND: friendsAvatarsBitmap.add(imageBitmap);
+                             adapter.notifyDataSetChanged();
+                             break;
             }
         }
     }
 
+    /**
+     * Adapter для вывода списка друзей VK
+     * @autor Миколенко Евгений (Fertnam)
+     * @version 2
+     */
     class VKFriendsAdapter extends BaseAdapter {
         @Override
         public int getCount() {
-            return friends.size();
+            return friendsName.size();
         }
 
         @Override
@@ -212,7 +242,7 @@ public class VKActivity extends AppCompatActivity {
                 TextView textView = view.findViewById(R.id.friendsName);
 
                 imageView.setImageBitmap(friendsAvatarsBitmap.get(position));
-                textView.setText(friends.get(position));
+                textView.setText(friendsName.get(position));
             } catch (IndexOutOfBoundsException e) {
                 e.printStackTrace();
             }
