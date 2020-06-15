@@ -98,6 +98,23 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/vkAuthButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@color/light_bg"
+            android:onClick="onVkAuthButtonClick"
+            android:padding="8dp"
+            android:shadowColor="@color/colorAccent"
+            android:shadowDx="20"
+            android:shadowDy="20"
+            android:text="Войти через VK"
+            android:textAllCaps="true"
+            android:textColor="@color/black_bg"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
         <TextView
             android:id="@+id/toRegisterActivityFromAuth"
             android:layout_width="match_parent"

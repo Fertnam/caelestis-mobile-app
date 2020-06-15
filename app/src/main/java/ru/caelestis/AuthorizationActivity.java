@@ -155,6 +155,13 @@ public class AuthorizationActivity extends AppCompatActivity implements SensorEv
     }
 
     /**
+     * Метод, выполняющийся при нажатии на кнопку авторизации через vk
+     */
+    public void onVkAuthButtonClick(View view) {
+        startActivity(new Intent(this, VKActivity.class));
+    }
+
+    /**
      * Метод, выполняющийся при нажатии на кнопку голосового ввода
      */
     public void onSpeechButtonClick(View view) {
